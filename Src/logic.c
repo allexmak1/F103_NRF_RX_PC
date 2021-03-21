@@ -56,7 +56,7 @@ HAL_Delay(500);
   //инициализация
   HAL_Delay(100);
   runRadio();
-  payload_length = 12;
+  payload_length = 12;//16
   HAL_Delay(500);
   
 }
@@ -65,10 +65,10 @@ HAL_Delay(500);
 void LOGIC(){
 
   //чтение всех входов и выходов
-  vReadStatePins();
+  //vReadStatePins();
   
   // подготовка данных
-  nRF24_payload[0] = jButton.uint8Message.gr1;
+  /*nRF24_payload[0] = jButton.uint8Message.gr1;
   nRF24_payload[1] = jButton.uint8Message.gr2;;
   nRF24_payload[2] = jButton.uint8Message.gr3;;
   nRF24_payload[3] = jButton.uint8Message.gr4;;
@@ -79,7 +79,7 @@ void LOGIC(){
   nRF24_payload[8] = jStickB.ValV;
   nRF24_payload[9] = jStickB.ValV >> 8;
   nRF24_payload[10] = jStickB.ValG;
-  nRF24_payload[11] = jStickB.ValG >> 8;
+  nRF24_payload[11] = jStickB.ValG >> 8;*/
   
   
 //периодическая отправка данных по NRF
@@ -90,7 +90,7 @@ void LOGIC(){
     timer_SendState = 0;
     
     //навигация между режимами
-    vNavigationMode();
+    //vNavigationMode();
   }
   
   //индикация работы 4го светодиода 

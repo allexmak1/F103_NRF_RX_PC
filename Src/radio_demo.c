@@ -7,6 +7,7 @@
 //
 // Buffer to store a payload of maximum width
 
+int wile = 0;
 
 #define HEX_CHARS      "0123456789ABCDEF"
 
@@ -23,7 +24,7 @@ void UART_SendStr(char *string) {
 }
 
 void Toggle_LED() {
-    //HAL_GPIO_TogglePin(LD2_GPIO_Port,LD2_Pin);
+    HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_13);
 }
 #else //USE_HAL_DRIVER
 
@@ -180,7 +181,7 @@ nRF24_TXResult nRF24_TransmitPacket(uint8_t *pBuf, uint8_t length) {
 #endif // DEMO_TX_
 
 
-int runRadio(void) {
+void runRadio(void) {
     UART_SendStr("\r\nSTM32F303RE is online.\r\n");
 
     // RX/TX disabled
@@ -190,13 +191,14 @@ int runRadio(void) {
     UART_SendStr("nRF24L01+ check: ");
 //#pragma clang diagnostic push
 //#pragma clang diagnostic ignored "-Wmissing-noreturn"
-    if (!nRF24_Check()) {
-        UART_SendStr("FAIL\r\n");
-        while (1) {
-            Toggle_LED();
-            Delay_ms(50);
+        while(wile == 0){
+          if(nRF24_Check()){
+            wile = 1;
+          }
+          UART_SendStr("FAIL\r\n");
+          Toggle_LED();
+	  Delay_ms(50);
         }
-    }
 //#pragma clang diagnostic pop
     UART_SendStr("OK\r\n");
 
@@ -929,7 +931,7 @@ int runRadio(void) {
 
 
     // The main loop
-    payload_length = 10;
+    payload_length = 32;///16
     j = 0;
     while (1) {
         // Prepare data packet
