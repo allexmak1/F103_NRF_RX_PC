@@ -5,6 +5,8 @@
 #include "config.h"
 
 extern TIM_HandleTypeDef htim1;
+extern TIM_HandleTypeDef htim2;
+extern TIM_HandleTypeDef htim3;
 
 jButton_t       jButton       = {0};
 jStick_t        jStickA       = {0};
@@ -23,6 +25,11 @@ uint8_t flag1, flag2;
 uint8_t flagFtont = 1;
 uint8_t flagBack = 1;
 uint8_t flagLeft, flagRight;
+uint32_t temp;
+int16_t temp2;
+uint32_t valLR = 0;
+uint8_t flag3 = 0;
+uint8_t flag4 = 0;
 
 extern uint8_t nRF24_payload[32];
 extern nRF24_RXResult pipe;
@@ -41,6 +48,9 @@ void LOGICstart(){
   HAL_Delay(300);
   vSetStateGpio(0, GPIOC, GPIO_PIN_13);
   HAL_TIM_Base_Start_IT(&htim1);
+  HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_2);
+  HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_3);
+  HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_4);
   HAL_Delay(100);
   
   //инициализация NRF
@@ -158,7 +168,7 @@ void LOGIC(){
   }else led.ftont = 1;
     
   //фары задние
-  if(jButton.bit.O && flagBack){
+  if(jButton.bit.B && flagBack){
     led.back = 0;
     led.back = ~led.back & 0x01;
   }else led.back = 1;
@@ -310,39 +320,65 @@ void vReadNRF(){
 void vMove(){
   //вперед
   if(jStickA.ValV > 0){
-    HAL_GPIO_WritePin(GPIOB, GPIO_PIN_3, GPIO_PIN_RESET);
-    HAL_GPIO_WritePin(GPIOB, GPIO_PIN_4, GPIO_PIN_SET);
+    HAL_GPIO_WritePin(GPIOB, GPIO_PIN_4, GPIO_PIN_RESET);
+    HAL_GPIO_WritePin(GPIOB, GPIO_PIN_3, GPIO_PIN_SET);
   }
   //назад
   if(jStickA.ValV < 0){
-    HAL_GPIO_WritePin(GPIOB, GPIO_PIN_4, GPIO_PIN_RESET);
-    HAL_GPIO_WritePin(GPIOB, GPIO_PIN_3, GPIO_PIN_SET);
+    HAL_GPIO_WritePin(GPIOB, GPIO_PIN_3, GPIO_PIN_RESET);    
+    HAL_GPIO_WritePin(GPIOB, GPIO_PIN_4, GPIO_PIN_SET);
   }
   //стоп
   if(jStickA.ValV == 0){
     HAL_GPIO_WritePin(GPIOB, GPIO_PIN_3, GPIO_PIN_RESET);
     HAL_GPIO_WritePin(GPIOB, GPIO_PIN_4, GPIO_PIN_RESET);
   }
-//  //вправо
-//  if(jStickB.ValG > 0){
-//    HAL_GPIO_WritePin(GPIOB, GPIO_PIN_5, GPIO_PIN_RESET);
-//    HAL_GPIO_WritePin(GPIOB, GPIO_PIN_6, GPIO_PIN_SET);
-//  }
-//  //влево
-//  if(jStickB.ValG < 0){
-//    HAL_GPIO_WritePin(GPIOB, GPIO_PIN_6, GPIO_PIN_RESET);
-//    HAL_GPIO_WritePin(GPIOB, GPIO_PIN_5, GPIO_PIN_SET);
-//  }
-//  //стоп
-//  if(jStickB.ValG == 0){
-//    HAL_GPIO_WritePin(GPIOB, GPIO_PIN_5, GPIO_PIN_RESET);
-//    HAL_GPIO_WritePin(GPIOB, GPIO_PIN_6, GPIO_PIN_RESET);
-//  }
+  //вправо
+  if(jStickB.ValG > 0){
+    valLR = 2450;
+    if(jStickB.ValG > 1000)valLR = 2150;
+    if(jStickB.ValG > 1600)valLR = 1850;
+  }
+  //влево
+  if(jStickB.ValG < 0){
+    valLR = 2950;
+    if(jStickB.ValG < 1000)valLR = 3250;
+    if(jStickB.ValG < 1600)valLR = 3550;
+  }
+  //стоп
+  if(jStickB.ValG == 0){
+    valLR = 2800;
+  }
   //скорости
+  temp2 = jStickA.ValV < 0? jStickA.ValV*-1 : jStickA.ValV;
+  temp = map((uint32_t)temp2, 0, 2080, 0, 65534);
   //ШИМ на driver_ENA
-//  __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_3, jStickA.ValV);
+  __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_3, temp);
   //ШИМ на driver_ENB
-//  __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_4, jStickB.ValV);
+  
+  //-------------
+  /*if(jButton.bit.X == 1){
+    if(flag3){
+      flag3 = 0;
+      valLR -= 100;
+    }
+  }else flag3 = 1;
+  
+  if(jButton.bit.B == 1){
+    if(flag4){
+      flag4 = 0;
+      valLR += 100;
+    }
+  }else flag4 = 1;*/
+  
+  
+  
+  //--------------
+  
+  
+  
+  __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_4, valLR);
+  //__HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_2, 20000);
 }
 
 //мигание светодиода, медленное
@@ -365,6 +401,6 @@ void vToogleLedNrfNormal(){
 }
 
 //масштабирование
-int map_i (int x, int in_min, int in_max, int out_min, int out_max){
+uint32_t map(uint32_t x, uint32_t in_min, uint32_t in_max, uint32_t out_min, uint32_t out_max){
   return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
 }

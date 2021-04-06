@@ -8,9 +8,9 @@ typedef union{
     uint8_t dawn  :1;//0.1
     uint8_t write :1;//0.2
     uint8_t left  :1;//0.3
-    uint8_t O     :1;//0.4
-    uint8_t X     :1;//0.5
-    uint8_t A     :1;//0.6
+    uint8_t A     :1;//0.4
+    uint8_t Y     :1;//0.5
+    uint8_t X     :1;//0.6
     uint8_t B     :1;//0.7
     
     uint8_t Lb    :1;//1.0
@@ -83,4 +83,4 @@ void vReadNRF();
 void vMove();
 void vToogleLedLow(uint8_t led);
 void vToogleLedNrfNormal();
-int map_i (int x, int in_min, int in_max, int out_min, int out_max);
+uint32_t map(uint32_t x, uint32_t in_min, uint32_t in_max, uint32_t out_min, uint32_t out_max);
