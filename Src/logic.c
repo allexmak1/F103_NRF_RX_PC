@@ -25,16 +25,14 @@ uint8_t flag1, flag2;
 uint8_t flagFtont = 1;
 uint8_t flagBack = 1;
 uint8_t flagLeft, flagRight;
-uint32_t temp;
-int16_t temp2;
+
 uint32_t valLR = 0;
 uint8_t flag3 = 0;
 uint8_t flag4 = 0;
 
 extern uint8_t nRF24_payload[32];
 extern nRF24_RXResult pipe;
-extern  uint8_t payload_length;
-extern nRF24_TXResult tx_res;
+extern uint8_t payload_length;
 
 void runRadio(void);
 #ifdef UART_ON
@@ -104,44 +102,30 @@ void LOGICstart(){
     //   - RF channel: 40 (2440MHz)
     //   - data rate: 2Mbps
     //   - CRC scheme: 2 byte
-
     // The transmitter sends a 10-byte packets to the address 'ESB' with Auto-ACK (ShockBurst enabled)
-
     // Set RF channel
     nRF24_SetRFChannel(40);
-
     // Set data rate
     nRF24_SetDataRate(nRF24_DR_2Mbps);
-
     // Set CRC scheme
     nRF24_SetCRCScheme(nRF24_CRC_2byte);
-
     // Set address width, its common for all pipes (RX and TX)
     nRF24_SetAddrWidth(3);
-
     // Configure RX PIPE
     static const uint8_t nRF24_ADDR[] = {'E', 'S', 'B'};
     nRF24_SetAddr(nRF24_PIPE1, nRF24_ADDR); // program address for pipe
     nRF24_SetRXPipe(nRF24_PIPE1, nRF24_AA_ON, 10); // Auto-ACK: enabled, payload length: 10 bytes
-
     // Set TX power for Auto-ACK (maximum, to ensure that transmitter will hear ACK reply)
     nRF24_SetTXPower(nRF24_TXPWR_0dBm);
-
     // Set operational mode (PRX == receiver)
     nRF24_SetOperationalMode(nRF24_MODE_RX);
-
     // Clear any pending IRQ flags
     nRF24_ClearIRQFlags();
-
     // Wake the transceiver
     nRF24_SetPowerMode(nRF24_PWR_UP);
-
     // Enable DPL
     nRF24_SetDynamicPayloadLength(nRF24_DPL_ON);
-
     nRF24_SetPayloadWithAck(1);
-
-
         // Put the transceiver to the RX mode
     nRF24_CE_H();*/
   
@@ -160,21 +144,29 @@ void LOGIC(){
   vMove();
   
   //зуммер
+  if(jButton.bit.A){
+  }
+    if(jButton.bit.B){
+  }
+    if(jButton.bit.X){
+  }
+    if(jButton.bit.Y){
+  }
   
   //фары передние
-  if(jButton.bit.A && flagFtont){
+  if(jButton.bit.StickA && flagFtont){
     flagFtont = 0;
     led.ftont = ~led.ftont & 0x01;
   }else led.ftont = 1;
     
   //фары задние
-  if(jButton.bit.B && flagBack){
+  if(jButton.bit.StickB && flagBack){
     led.back = 0;
     led.back = ~led.back & 0x01;
   }else led.back = 1;
   
   //мигалка
-  if(jButton.bit.X){
+  if(jButton.bit.home){
     led.toogleR = 1;
     led.toogleL = 1;
   }else{
@@ -183,7 +175,7 @@ void LOGIC(){
   }
   
   //поворотники правый
-  if(jButton.bit.Rb){
+  if(jButton.bit.Rs){
     flagRight = 1;
   }
   if(flagRight){
@@ -191,7 +183,7 @@ void LOGIC(){
   }else led.right = 0;
 
   //поворотники левый
-  if(jButton.bit.Lb){
+  if(jButton.bit.Ls){
     flagLeft = 1;
   }
   if(flagLeft){
@@ -199,13 +191,13 @@ void LOGIC(){
   }else led.left = 0;
   
   //индикация работы светодиода состояния NRF
-  if(timer_SendState > 200){
-    timer_SendState = 0;
+  if(timer_SendState > 400){
     stateNrf = NRF_OFF;
   }  
   if(stateNrf == NRF_OFF){
-    HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_13);
-    Delay_ms(50);
+    //HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_13);
+    led.nrfState = (~led.nrfState)& 0x1;
+    Delay_ms(150);
   }else{
     vToogleLedNrfNormal();
   }
@@ -221,21 +213,21 @@ void LOGIC(){
 
   //отсчет таймера засыпания 
   if(timer_Sleep > TIMER_SLEEP){
-//    timer_Sleep=0;
-//    //индикация лампочки состояния
-//    vSetStateGpio(1, GPIOC, GPIO_PIN_13);
-//    //остановка NRF
-//    nRF24_SetPowerMode(nRF24_PWR_DOWN);	
-//    //остановка тактирования
-//    HAL_TIM_Base_Stop_IT(&htim1);
-//    HAL_TIM_Base_Stop(&htim1);
-//    HAL_SuspendTick();//регистр  TICKINT
-//    //засыпаем
-//    HAL_PWR_EnterSTOPMode(PWR_LOWPOWERREGULATOR_ON , PWR_SLEEPENTRY_WFI);
-//    //просыпаемся
-//    HAL_GPIO_WritePin(GPIOA, GPIO_PIN_15, GPIO_PIN_RESET);
-//    //!!!здесь проще запустить перезагрузку МК, чем запуск всей переферии, так как сбрасываются все регисторы настроек при глубоком сне
-//    //сделанно это просто - не вкючаем тактирование таймера1, там где сбрасывется сторожевой таймер, он и перезагрузит.
+    timer_Sleep=0;
+    //индикация лампочки состояния
+    vSetStateGpio(1, GPIOC, GPIO_PIN_13);
+    //остановка NRF
+    nRF24_SetPowerMode(nRF24_PWR_DOWN);	
+    //остановка тактирования
+    HAL_TIM_Base_Stop_IT(&htim1);
+    HAL_TIM_Base_Stop(&htim1);
+    HAL_SuspendTick();//регистр  TICKINT
+    //засыпаем
+    HAL_PWR_EnterSTOPMode(PWR_LOWPOWERREGULATOR_ON , PWR_SLEEPENTRY_WFI);
+    //просыпаемся
+    HAL_GPIO_WritePin(GPIOA, GPIO_PIN_15, GPIO_PIN_RESET);
+    //!!!здесь проще запустить перезагрузку МК, чем запуск всей переферии, так как сбрасываются все регисторы настроек при глубоком сне
+    //сделанно это просто - не вкючаем тактирование таймера1, там где сбрасывется сторожевой таймер, он и перезагрузит.
   }
   //HAL_Delay(10);
 }
@@ -275,6 +267,7 @@ void vReadNRF(){
     UART_SendStr("<\r\n");
     #endif
     stateNrf = NRF_ON;
+    timer_SendState = 0;
   }/*
         //
         // Constantly poll the status of the RX FIFO and get a payload if FIFO is not empty
@@ -318,67 +311,64 @@ void vReadNRF(){
 
 //движение
 void vMove(){
+  static uint32_t speedPrivod;
+  uint32_t maxSpeedPrivod;  
+  uint32_t speedServo;
+  uint16_t temp;
+
   //вперед
-  if(jStickA.ValV > 0){
+  if(jStickA.ValV > 0 || jButton.bit.up){
     HAL_GPIO_WritePin(GPIOB, GPIO_PIN_4, GPIO_PIN_RESET);
     HAL_GPIO_WritePin(GPIOB, GPIO_PIN_3, GPIO_PIN_SET);
+    //if(jButton.bit.up)
   }
   //назад
-  if(jStickA.ValV < 0){
+  if(jStickA.ValV < 0 || jButton.bit.dawn){
     HAL_GPIO_WritePin(GPIOB, GPIO_PIN_3, GPIO_PIN_RESET);    
     HAL_GPIO_WritePin(GPIOB, GPIO_PIN_4, GPIO_PIN_SET);
   }
   //стоп
-  if(jStickA.ValV == 0){
+  if(jStickA.ValV == 0 && jButton.bit.up == 0 && jButton.bit.dawn == 0 ){
     HAL_GPIO_WritePin(GPIOB, GPIO_PIN_3, GPIO_PIN_RESET);
     HAL_GPIO_WritePin(GPIOB, GPIO_PIN_4, GPIO_PIN_RESET);
+    speedPrivod = 0;
   }
+  //скорости
+  temp = jStickA.ValV < 0 ? -1*jStickA.ValV : jStickA.ValV;//abs(jStickA.ValV);
+  if(jButton.bit.osn == 1)maxSpeedPrivod = SPEED_1;
+  else if(jButton.bit.osn == 2)maxSpeedPrivod = SPEED_2;
+  else if(jButton.bit.osn == 3)maxSpeedPrivod = SPEED_3;
+  if(jButton.bit.up || jButton.bit.dawn){
+    if(speedPrivod < maxSpeedPrivod)speedPrivod += 100;
+    else speedPrivod = maxSpeedPrivod;
+  }else speedPrivod = map((uint32_t)temp, 0, 2080, 0, maxSpeedPrivod);
+  __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_3, speedPrivod);
+  
+  
   //вправо
   if(jStickB.ValG > 0){
-    valLR = 2450;
-    if(jStickB.ValG > 1000)valLR = 2150;
-    if(jStickB.ValG > 1600)valLR = 1850;
+    speedServo = map((uint32_t)jStickB.ValG, 2100, 0, SERVO_WRITE, SERVO_CENTR);
+    flagRight = 0;
+  }
+  if(jButton.bit.write){
+    speedServo = SERVO_WRITE;
+    flagRight = 0;
   }
   //влево
   if(jStickB.ValG < 0){
-    valLR = 2950;
-    if(jStickB.ValG < 1000)valLR = 3250;
-    if(jStickB.ValG < 1600)valLR = 3550;
+    temp = jStickB.ValG < 0 ? -1*jStickB.ValG : jStickB.ValG;//abs(jStickB.ValG);
+    speedServo = map((uint32_t)temp, 0, 2100, SERVO_CENTR, SERVO_LEFT);
+    flagLeft = 0;
+  }
+  if(jButton.bit.left){
+    speedServo = SERVO_LEFT;
+    flagLeft = 0;
   }
   //стоп
-  if(jStickB.ValG == 0){
-    valLR = 2800;
+  if(jStickB.ValG == 0 && jButton.bit.write == 0 && jButton.bit.left == 0){
+    speedServo = SERVO_CENTR;
   }
-  //скорости
-  temp2 = jStickA.ValV < 0? jStickA.ValV*-1 : jStickA.ValV;
-  temp = map((uint32_t)temp2, 0, 2080, 0, 65534);
-  //ШИМ на driver_ENA
-  __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_3, temp);
-  //ШИМ на driver_ENB
-  
-  //-------------
-  /*if(jButton.bit.X == 1){
-    if(flag3){
-      flag3 = 0;
-      valLR -= 100;
-    }
-  }else flag3 = 1;
-  
-  if(jButton.bit.B == 1){
-    if(flag4){
-      flag4 = 0;
-      valLR += 100;
-    }
-  }else flag4 = 1;*/
-  
-  
-  
-  //--------------
-  
-  
-  
-  __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_4, valLR);
-  //__HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_2, 20000);
+  __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_4, speedServo);
 }
 
 //мигание светодиода, медленное

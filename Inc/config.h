@@ -131,5 +131,13 @@ WatchDog:
 */
 
 //ПАРАМЕТРЫ ПРОЕКТА
-#define UART_ON          1      //использование UART
-#define TIMER_SLEEP      60000*5//ms, время бездействия
+#define UART_ON          0      //использование UART
+#define TIMER_SLEEP      60000*10//ms, время бездействия
+
+#define SERVO_WRITE      1850//максимальное положение сервы (право)
+#define SERVO_CENTR      2700//максимальное положение сервы (середина)
+#define SERVO_LEFT       3550//максимальное положение сервы (лево)
+
+#define SPEED_1          15000//максимальная скорость
+#define SPEED_2          30000//максимальная скорость
+#define SPEED_3          65534//максимальная скорость
