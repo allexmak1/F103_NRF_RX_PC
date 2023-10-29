@@ -1,34 +1,68 @@
 # F103_NRF_RX_PC
 
-Корманный прибор измерения влажности и температуры,
-работающий на акб.
+![Иллюстрация к проекту](https://github.com/jon/coolproject/raw/master/image/image.png)
+
+ПО для радиоуправляемой модели.
+Более подробные настройки в Inc/config.h
 
 https://www.youtube.com/watch?v=npfDz2VAjL4
 
 ## Hardware 
- * STM32F103RET6 (72 MHz SYSCLK)
- * датчик влажности DHT
- * дисплей
- * аккумулятор 
+ * STM32F103REV6 (72 MHz SYSCLK)
+ * NRF модуль NRF24L 
+ * драйверный мост для моторов
+ * АКБ Li-Ion (3,7v),
+ * зарядная плата
 
 ### Pins
 
-|LCD Board|Nucleo |STM32F411RE| Description       |
-| ------- |:-----:| ---------:|	--------------:	  |
-|VCC      |CN6-4  | -         | 3.3V              |
-|GND      |CN6-6  | -         | GND	              |
-|CS       |CN5-3  | PB6       | D10, Chip Select  |
-|RST      |CN9-5  | PB5       | D4,  LCD Reset    |
-|DC       |CN7-21 | PB7       | Data control      |
-|MOSI     |CN5-4  | PA7       | D11, MOSI         |
-|SCK      |CN5-6  | PA5       | D13, SCK          |
-|LED      |CN7-5  | VDD       | 5V                |
-|MISO     |CN5-5  | PA6       | D12, MISO         |
+|STM32F103REV6|Description |Info|
+| ----------- |:----------:|	--------------:|
+|PB12         | Led_Front  | передние фары  |
+|PB13         | Led_Back   | задние фары    |
+|PB14         | Led_Left   | поворотнфик левый  |
+|PB15         | Led_Right   | поворотник правый  |
+|PA8          |            |   |
+|PA9          | UART_TX    | для отладки  |
+|PA10         | UART_RT   |   |
+|PA11         | Led_ToogleR   | мигалка  |
+|PA12         | Led_ToogleL   | мигалка  |
+|PA15         |            |   |
+|PB3          | driver_IN1 |  ШИМ на мотор |
+|PB4          | driver_IN2 |  ШИМ на мотор |
+|PB5           |            |   |
+|PB6           |            |   |
+|PB7           |            |   |
+|PB8           |            |   |
+|PB9           |            |   |
+|5V          |            |   |
+|GND          |            |   |
+|3V3          |            |   |
+| ----------- |:----------:|	--------------:|
+|GND          |            |   |
+|GND          |            |   |
+|3V3          |            |   |
+|NRST          |            |   |
+|PB11          |            |   |
+|PB10          |            |   |
+|PB1           | SPI1_CS           | NRF  |
+|PB0           | SPI1_DT           | NRF  |
+|PA7           | SPI1_MOSI           | NRF  |
+|PA6           | SPI1_MISO           | NRF  |
+|PA5           | SPI1_SCK           | NRF  |
+|PA4           | bizzer_PWM           | сигнал  |
+|PA3           | voltage_ADC           | напряжение на акб  |
+|PA2           | driver_ENA_PWM           |   |
+|PA1           |            |   |
+|PA0           |            |   |
+|PC15          |            |   |
+|PC14          |            |   |
+|PC13          |            |   |
 
 ## To-Do
 
  - [x] Закончить проект, протестироть
- - [ ] Подключить более высокоточный датчик
+ - [ ] Отобразить заряд акб машины на пульте
 
 ## Resources
 
