@@ -34,6 +34,7 @@ uint32_t timer_Sleep = 0;
 uint32_t timer_SendState = 0;
 uint32_t timer_Led4 = 0;
 uint32_t timer_LedLow = 0;
+uint32_t timer_LedToogle = 0;
 extern jButton_t jButton;
 
 /* USER CODE END TD */
@@ -248,6 +249,7 @@ void TIM1_UP_IRQHandler(void)
   timer_SendState++;
   timer_Led4++;
   timer_LedLow++;
+  timer_LedToogle++;
   /* USER CODE END TIM1_UP_IRQn 1 */
 }
 

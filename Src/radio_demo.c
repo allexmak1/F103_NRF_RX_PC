@@ -7,6 +7,7 @@
 // Buffer to store a payload of maximum width
 
 int wile = 0;
+int x;
 
 #define HEX_CHARS      "0123456789ABCDEF"
 
@@ -23,7 +24,7 @@ void UART_SendStr(char *string) {
 }
 
 void Toggle_LED() {
-	HAL_GPIO_TogglePin(GPIOA,GPIO_PIN_15);
+	HAL_GPIO_TogglePin(GPIOC,GPIO_PIN_13);
 }
 #else //USE_HAL_DRIVER
 
@@ -83,14 +84,14 @@ uint32_t i,j,k;
 // Length of received payload
 uint8_t payload_length;
 
-#define DEMO_RX_SINGLE      0 // Single address receiver (1 pipe)
+#define DEMO_RX_SINGLE      0//1 // Single address receiver (1 pipe)
 #define DEMO_RX_MULTI       0 // Multiple address receiver (3 pipes)
 #define DEMO_RX_SOLAR       0 // Solar temperature sensor receiver
-#define DEMO_TX_SINGLE      1 // Single address transmitter (1 pipe)
+#define DEMO_TX_SINGLE      0 // Single address transmitter (1 pipe)
 #define DEMO_TX_MULTI       0 // Multiple address transmitter (3 pipes)
 #define DEMO_RX_SINGLE_ESB  0 // Single address receiver with Enhanced ShockBurst (1 pipe)
 #define DEMO_TX_SINGLE_ESB  0 // Single address transmitter with Enhanced ShockBurst (1 pipe)
-#define DEMO_RX_ESB_ACK_PL  0 // Single address receiver with Enhanced ShockBurst (1 pipe) + payload sent back
+#define DEMO_RX_ESB_ACK_PL  1 // Single address receiver with Enhanced ShockBurst (1 pipe) + payload sent back
 #define DEMO_TX_ESB_ACK_PL  0 // Single address transmitter with Enhanced ShockBurst (1 pipe) + payload received in ACK
 
 
@@ -796,7 +797,7 @@ void runRadio(void) {
 
 /***************************************************************************/
 
-#if (DEMO_RX_ESB_ACK_PL)
+#if (DEMO_RX_ESB_ACK_PL)//----------
 
 	// This is simple receiver with Enhanced ShockBurst:
 	//   - RX address: 'ESB'
@@ -841,8 +842,7 @@ void runRadio(void) {
 
 
     // The main loop
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wmissing-noreturn"
+
     while (1) {
     	//
     	// Constantly poll the status of the RX FIFO and get a payload if FIFO is not empty
@@ -850,6 +850,7 @@ void runRadio(void) {
     	// This is far from best solution, but it's ok for testing purposes
     	// More smart way is to use the IRQ pin :)
     	//
+      x = nRF24_GetStatus_RXFIFO() ;
     	if (nRF24_GetStatus_RXFIFO() != nRF24_STATUS_RXFIFO_EMPTY) {
     		// Get a payload from the transceiver
     		pipe = nRF24_ReadPayload(nRF24_payload, &payload_length);
@@ -866,7 +867,7 @@ void runRadio(void) {
 			UART_SendStr("<\r\n");
     	}
     }
-#pragma clang diagnostic pop
+
 
 #endif // DEMO_RX_SINGLE_ESB
 
