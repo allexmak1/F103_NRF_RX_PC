@@ -1,6 +1,6 @@
 # F103_NRF_RX_PC
 
-![Иллюстрация к проекту](https://github.com/jon/coolproject/raw/master/image/image.png)
+![Screnshot](https://github.com/allexmak1/F103_NRF_RX_PC/image/image.png)
 
 ПО для радиоуправляемой модели.
 Более подробные настройки в Inc/config.h
