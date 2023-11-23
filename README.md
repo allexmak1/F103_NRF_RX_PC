@@ -2,7 +2,7 @@
 
 ![Screnshot](https://github.com/allexmak1/F103_NRF_RX_PC/blob/main/image/image.png)
 
-ПО для радиоуправляемой модели.
+ПО микроконтроллера для радиоуправляемой модели.
 Более подробные настройки в Inc/config.h
 
 https://www.youtube.com/watch?v=npfDz2VAjL4
